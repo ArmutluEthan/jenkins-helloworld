@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  jenkins:
+    build: build/jenkins
+    privileged: true
+    user: root
+    ports:
+      - 8080:8080
+    container_name: jenkins
+    volumes:
+      - ./data/jenkins_home:/var/jenkins_home
+      - ./data/certs:/certs/clien:ro
+      - ./jenkins-data:/var/jenkins_home
+    environment:
+      - DOCKER_TLS_VERIFY=1
+      - DOCKER_CERT_PATH=/certs/client
+      - DOCKER_HOST=tcp://docker:2376
+  docker:
+    image: docker:dind
+    privileged: true
+    ports:
+      - 9999:2376
+    container_name: docker
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    volumes:
+      - ./data/jenkins_home:/var/jenkins_home
+      - ./data/certs:/certs/client
+      - ./data/docker/etc/docker:/etc/docker
